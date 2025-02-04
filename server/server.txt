@@ -1,0 +1,58 @@
+const express = require("express");
+const { google } = require("googleapis");
+const axios = require("axios");
+
+const app = express();
+const SPREADSHEET_ID = "1UzC32yPdzV6N2TNh7qGYv1d1gPbhrFlkfqdGbFt5Dc4";
+const SHEET_NAME = "Sheet1"; 
+
+// إعداد الاتصال بجوجل شيت
+const getSheetsClient = async () => {
+  const auth = new google.auth.GoogleAuth({
+    keyFile: "credentials.json",
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+  return google.sheets({ version: "v4", auth: await auth.getClient() });
+};
+
+// جلب البيانات من الـ API وإرسالها إلى جوجل شيت
+app.get("/sync-sample", async (req, res) => {
+  try {
+    // جلب البيانات من API
+    const response = await axios.get("https://dummy-json.mock.beeceptor.com/todos");
+    
+    if (!response.data || response.data.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No data found in the API response.",
+      });
+    }
+
+    const sheetValues = response.data.map(item => [item.id, item.title, item.completed]);
+
+    // إرسال البيانات إلى Google Sheets
+    const sheets = await getSheetsClient();
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SPREADSHEET_ID,
+      range: `${SHEET_NAME}!A2:C`, // حفظ البيانات في الأعمدة A و B و C
+      valueInputOption: "USER_ENTERED",
+      resource: { values: sheetValues },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Data successfully added to Google Sheets.",
+      addedRecords: sheetValues.length,
+    });
+
+  } catch (error) {
+    console.error("Error syncing data:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to sync data with Google Sheets.",
+      error: error.message,
+    });
+  }
+});
+
+app.listen(1337, () => console.log("Server running on port 1337"));
