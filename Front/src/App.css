@@ -1,0 +1,14 @@
+/* تأكد من تطبيق هذه القواعد على عناصر الـ HTML و body */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+/* حاوية التطبيق لتوسيط المحتوى */
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* يجعل الارتفاع يملأ الشاشة بالكامل */
+  background-color: #f0f0f0; /* لون خلفية خفيف، يمكنك تغييره */
+}

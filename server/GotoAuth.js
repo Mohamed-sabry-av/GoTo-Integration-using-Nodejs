@@ -1,15 +1,16 @@
 const axios = require("axios");
-require("dotenv").config();
+const dotenv = require("dotenv");
+dotenv.config();
 
 // GoTo API Credentials
-const GOTO_CLIENT_ID = "f74a8d84-dc32-41ac-891b-659ec253d903";
-const GOTO_CLIENT_SECRET = "nNTISo2dtYFdLKtN0sACRXqj";
-const GOTO_AUTH_URL = "https://authentication.logmeininc.com/oauth/token";
-const GOTO_API_BASE = "https://api.goto.com";
+const GOTO_CLIENT_ID = process.env.GOTO_CLIENT_ID;
+const GOTO_CLIENT_SECRET = process.env.GOTO_CLIENT_SECRET;
+const GOTO_AUTH_URL = process.env.GOTO_AUTH_URL;
+const GOTO_API_BASE = process.env.GOTO_API_BASE;
 const CALL_LOGS_ENDPOINT = `${GOTO_API_BASE}/call-events-report/v1/report-summaries`;
 
 // Account Key (required by GoTo API)
-const userKey = "7098445314927025895"; 
+const accountKey = "7098445314927025895"; 
 
 // Redirect URI for authentication
 const REDIRECT_URI = "https://example.com";
@@ -123,7 +124,7 @@ const fetchCallLogs = async (fromDate, toDate) => {
     }
 
     const params = {
-      userKey: userKey,
+      accountKey: accountKey,
       startTime: fromDate.toISOString(),
       endTime: toDate.toISOString(),
       pageSize: 200,
